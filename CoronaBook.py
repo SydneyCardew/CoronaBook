@@ -26,6 +26,7 @@ def draw_page(draw_criteria, pages, current_dir, remainder, whole_pages):
         os.chdir(f"{current_dir}/Test/")
         if whole_pages is False:
             page_draw(remainder, pages, current_dir)
+            pages -= 1
         else:
             pass
         while pages > 0:
@@ -37,41 +38,22 @@ def draw_page(draw_criteria, pages, current_dir, remainder, whole_pages):
 
 
 def page_draw(page_icon, pages, current_dir):
-    cursor_x = 65
-    cursor_y = 148
     icon = Image.open(f"{current_dir}/Assets/Icons/Deathicon.png")
     page = Image.new('RGB', (1748, 2480), color=(255, 255, 255))
-    if page_icon == 500:
-        full_rows = True
-        rows = 20
-    else:
-        full_rows = False
-        rows = page_icon//25
-        last_row_num = page_icon % 25
-        print(page_icon, full_rows, rows, last_row_num)
-    while rows > 0:
-        if full_rows is False:
-            if rows == 1:
-                row_fill = last_row_num
-            else:
-                row_fill = 25
-        else:
-            row_fill = 25
-        while row_fill > 0:
-            page.paste(icon, box=(cursor_x, cursor_y), mask=None)
-            cursor_x += 65
-            page_icon -= 1
-            row_fill -= 1
-        cursor_y += 108
-        cursor_x = 65
-        rows -= 1
+    for x in range(page_icon):
+        icon_number = x
+        row = icon_number // 25
+        column = icon_number % 25
+        cursor_x = 65 + (65 * column)
+        cursor_y = 148 + (108 * row)
+        page.paste(icon, box=(cursor_x, cursor_y), mask=None)
     cursor_x = 1480
     cursor_y = 2400
     textfont = ImageFont.truetype(font=f"{current_dir}/Assets/Fonts/Crimson-Italic.ttf", size=10, index=0, encoding='',
                                   layout_engine=None)
     page_text = ImageDraw.Draw(page)
     page_text.text((cursor_x, cursor_y), f"{pages}", font=textfont,
-              fill=(000, 000, 000))
+                   fill=(000, 000, 000))
     page.save(f"test{pages}.png")  # saves a file with the appropriate number
     page.close()
     print('|', end='')
