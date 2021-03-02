@@ -36,44 +36,51 @@ def draw_page(draw_criteria, pages, current_dir, remainder, whole_pages):
         pass
 
 
-def page_draw(pageicon, pages, current_dir):
+def page_draw(page_icon, pages, current_dir):
     cursor_x = 65
-    cursor_y = 108
+    cursor_y = 148
     icon = Image.open(f"{current_dir}/Assets/Icons/Deathicon.png")
     page = Image.new('RGB', (1748, 2480), color=(255, 255, 255))
-    if pageicon == 500:
-        fullrows = True
-        rows = 25
+    if page_icon == 500:
+        full_rows = True
+        rows = 20
     else:
-        fullrows = False
-        rows = pageicon//25
-        lastrownum = pageicon % 25
-        print(fullrows, rows, lastrownum)
+        full_rows = False
+        rows = page_icon//25
+        last_row_num = page_icon % 25
+        print(page_icon, full_rows, rows, last_row_num)
     while rows > 0:
-        if fullrows is False:
+        if full_rows is False:
             if rows == 1:
-                rowfill = lastrownum
+                row_fill = last_row_num
             else:
-                rowfill = 25
+                row_fill = 25
         else:
-            rowfill = 25
-        while rowfill > 0:
+            row_fill = 25
+        while row_fill > 0:
             page.paste(icon, box=(cursor_x, cursor_y), mask=None)
             cursor_x += 65
-            pageicon -= 1
-            rowfill -= 1
+            page_icon -= 1
+            row_fill -= 1
         cursor_y += 108
         cursor_x = 65
         rows -= 1
+    cursor_x = 1480
+    cursor_y = 2400
+    textfont = ImageFont.truetype(font=f"{current_dir}/Assets/Fonts/Crimson-Italic.ttf", size=10, index=0, encoding='',
+                                  layout_engine=None)
+    page_text = ImageDraw.Draw(page)
+    page_text.text((cursor_x, cursor_y), f"{pages}", font=textfont,
+              fill=(000, 000, 000))
     page.save(f"test{pages}.png")  # saves a file with the appropriate number
     page.close()
     print('|', end='')
 
 
-def book_stats(deathnumber):
-    page_value_1 = deathnumber // 500
-    page_value_2 = deathnumber / 500
-    page_value_3 = deathnumber % 500
+def book_stats(death_number):
+    page_value_1 = death_number // 500
+    page_value_2 = death_number / 500
+    page_value_3 = death_number % 500
     if page_value_2 > page_value_1:
         page_value_1 += 1
         whole_pages = False
@@ -101,9 +108,9 @@ def readcsv(current_dir):  # reads the csv file
     return tabledata
 
 
-def deathget(datasource):  # retrieves the dataset from coronavirus.gov.uk
-    req = requests.get(datasource)
-    deathdata = req.content
+def deathget(data_source):  # retrieves the dataset from coronavirus.gov.uk
+    req = requests.get(data_source)
+    death_data = req.content
     if args.log:
         log.write('New download request\n\n')
         log.write('request status code:\n')
@@ -111,7 +118,7 @@ def deathget(datasource):  # retrieves the dataset from coronavirus.gov.uk
         log.write('request header:\n')
         log.write(f"{req.headers}\n\n")
     csv_file = open('deathdata.csv', 'wb')
-    csv_file.write(deathdata)
+    csv_file.write(death_data)
     csv_file.close()
 
 
@@ -153,7 +160,7 @@ if args.log:
 if args.nodownload:
     pass
 else:
-    deathget(datasource)
+    deathget(data_source)
 tabledata = readcsv(current_dir)
 del tabledata[0]
 while (len(tabledata)) > 365:
@@ -162,13 +169,13 @@ if (len(tabledata)) < 365:
     print('(Error: Less than 1 years data exists)')
 latestdeathdate = tabledata[0][0][1:-1]
 firstdeathdate = tabledata[-1][0][1:-1]
-deathnumber = int(tabledata[0][4])
+death_number = int(tabledata[0][4])
 print(f"The first person in the UK died of Coronavirus on {firstdeathdate}. In the year since,"
-      f"{deathnumber} have died.")
+      f"{death_number} have died.")
 print(f"This program constructs a memorial book containing an icon for each individual death, in order to convey the "
       f"enormity of the tragedy.")
 print(f"It is intended as an explicit indictment of the British government's handling of this disaster.")
 input(f"Press enter to continue with memorial book generation.")
-pages, whole_pages, remainder = book_stats(deathnumber)
+pages, whole_pages, remainder = book_stats(death_number)
 print(f"The book will have {pages} pages.")
 draw_page('main', pages, current_dir, remainder, whole_pages)
