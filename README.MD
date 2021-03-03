@@ -16,6 +16,12 @@ such as a bound copy of every single frame of *Fantasia*. In this case, the
 instructions are written in computer code and result in a PDF which should be
 ready to be printed through any variety of on-demand services.
 
+###
+
+If you would like to support me, buy me a coffee:
+
+https://ko-fi.com/sydneycardew
+
 ---
 
 ### Instructions
@@ -43,8 +49,9 @@ of the pandemic, whilst 'total' creates a book up to the latest available date.
 **0.1.0**: Creation of PNG files for the body of the book 
 working correctly. Logging and terminal under way.   
 **0.1.1**: Minor bug fixes, added font licensing info.    
-**0.2.0**: Front and back matter generation.
-**0.2.1**: Expanded README, some small tweaks.
+**0.2.0**: Front and back matter generation.    
+**0.2.1**: Expanded README, some small tweaks.    
+**0.2.2**: Further tweaks, prototyping PDF maker function.
 
 ---
 

@@ -10,6 +10,7 @@ from PIL import ImageDraw
 from PIL import ImageFont
 from datetime import date
 from datetime import datetime
+from reportlab.pdfgen.canvas import Canvas
 
 
 def draw_page(draw_criteria, pages, current_dir, remainder, whole_pages):  # controls the creation of the body pages
@@ -25,10 +26,10 @@ def draw_page(draw_criteria, pages, current_dir, remainder, whole_pages):  # con
         page.close()
     elif draw_criteria == 'main':  # main routine
         try:
-            os.mkdir(f"{current_dir}/Test/")
+            os.mkdir(f"{current_dir}/Output/")
         except FileExistsError:
             pass
-        os.chdir(f"{current_dir}/Test/")
+        os.chdir(f"{current_dir}/Output/")
         if whole_pages is False:  # this special 'if' creates the last (not completely filled) page. Clean up?
             page_draw(remainder, pages, current_dir, total_pages)
             pages -= 1
@@ -154,7 +155,7 @@ def front_matter():  # creates the frontmatter of the book.
     blanks = 2
     for x in range (blanks):
         page = Image.new('RGB', (1748, 2480), color=(255, 255, 255))  # makes the blank page
-        page.save(f"front0{x}.png")  # saves a file with the appropriate number
+        page.save(f"frnt0{x}.png")  # saves a file with the appropriate number
     page = Image.new('RGB', (1748, 2480), color=(255, 255, 255))  # makes the blank page
     title_font = ImageFont.truetype(font=f"{current_dir}/Assets/Fonts/Crimson-Bold.ttf", size=260, index=0, encoding='',
                                     layout_engine=None)  # the font for the main title
@@ -174,7 +175,7 @@ def front_matter():  # creates the frontmatter of the book.
                              fill=(000, 000, 000), align="center", spacing=10)
     page_text.text((422, 1660), f"Our leaders have blood on their hands.", font=intro_font, fill=(000, 000, 000))
     page_text.text((451, 2350), f"© Sydney Cardew for Idle Toil Press, 2021", font=copy_font, fill=(000, 000, 000))
-    page.save(f"front03.png")
+    page.save(f"frnt03.png")
 
 
 def back_matter(pages):
@@ -184,7 +185,17 @@ def back_matter(pages):
         blanks = 3
     for x in range (blanks):
         page = Image.new('RGB', (1748, 2480), color=(255, 255, 255))  # makes the blank page
-        page.save(f"back0{x}.png")  # saves a file with the appropriate number
+        page.save(f"rear0{x}.png")  # saves a file with the appropriate number
+
+
+def pdf_maker():
+    os.chdir(f"{current_dir}/Output/")
+    canvas = Canvas("TheTally.pdf", pagesize='A5')
+    for entry in os.scandir(f"{current_dir}/Output/"):
+        filename = str(entry)[-12:-2]
+        Image(f"{current_dir}/Output/{filename}")
+        canvas.showPage()
+    canvas.save()
 
 
 parser = argparse.ArgumentParser(prog="CoronaBook")
@@ -219,12 +230,13 @@ if args.log:
         path_pad_string = path_pad(log_increment, log_length)  # This increments the log filenames correctly
     log = open(f"{current_dir}/Logs/log {today} {path_pad_string}{str(log_increment)}.txt", "w")
     log_num = str(len([name for name in os.listdir(f"{current_dir}/Logs")
-                      if os.path.isfile(os.path.join(f"{current_dir}/Logs", name))])) # gets the total number of logs
+                      if os.path.isfile(os.path.join(f"{current_dir}/Logs", name))]))  # gets the total number of logs
     log.write(f"CoronaBook log number {log_num}. Date: {today}. Time: {small_time}\n")
     log.write(' ' + '\n')
     logging = True
 if args.nodownload:
-    log.write('No new download request.\n\n')
+    if args.log:
+        log.write('No new download request.\n\n')
 else:
     deathget(data_source)
 table_data = read_csv(current_dir)
@@ -269,4 +281,6 @@ print(f"Creating front matter.\n")
 front_matter()
 print(f"Creating back matter.\n")
 back_matter(pages)
-print(f"PNG generation is complete.")
+print(f"PNG generation is complete.\n")
+print(f"Generating PDF.\n")
+pdf_maker()
