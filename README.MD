@@ -3,7 +3,7 @@
 
 CoronaBook is a Python script that automatically 
 creates a printable book from a set of data, in this case the total deaths 
-from COVID-19 reported in the first year of the pandemic. By converting
+from COVID-19 reported in the first year of the pandemic in the UK. By converting
 this raw data into a tangible physical object it is hoped that some sense
 of the enormity of the tragedy will be conveyed, that the intangible will be 
 reified.
