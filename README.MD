@@ -51,7 +51,8 @@ working correctly. Logging and terminal under way.
 **0.1.1**: Minor bug fixes, added font licensing info.    
 **0.2.0**: Front and back matter generation.    
 **0.2.1**: Expanded README, some small tweaks.    
-**0.2.2**: Further tweaks, prototyping PDF maker function.
+**0.2.2**: Further tweaks, prototyping PDF maker function.     
+**0.5.0**: PDF maker function working, further refinements.
 
 ---
 

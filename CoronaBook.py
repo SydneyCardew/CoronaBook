@@ -10,7 +10,7 @@ from PIL import ImageDraw
 from PIL import ImageFont
 from datetime import date
 from datetime import datetime
-from reportlab.pdfgen.canvas import Canvas
+from fpdf import FPDF
 
 
 def draw_page(draw_criteria, pages, current_dir, remainder, whole_pages):  # controls the creation of the body pages
@@ -26,10 +26,22 @@ def draw_page(draw_criteria, pages, current_dir, remainder, whole_pages):  # con
         page.close()
     elif draw_criteria == 'main':  # main routine
         try:
-            os.mkdir(f"{current_dir}/Output/")
-        except FileExistsError:
+            os.makedirs(f"{current_dir}/Output")
+        except OSError as exc:  # handles the error if the directory already exists
+            if exc.errno != errno.EEXIST:
+                raise
             pass
-        os.chdir(f"{current_dir}/Output/")
+        output_increment = 0
+        path_pad_string = path_pad(log_increment, log_length)
+        while os.path.exists(f"{current_dir}/Output/Tally {output_increment}"):
+            output_increment += 1
+        try:
+            os.makedirs(f"{current_dir}/Output/Tally {output_increment}")
+        except OSError as exc:  # handles the error if the directory already exists
+            if exc.errno != errno.EEXIST:
+                raise
+            pass
+        os.chdir(f"{current_dir}/Output/Tally {output_increment}")
         if whole_pages is False:  # this special 'if' creates the last (not completely filled) page. Clean up?
             page_draw(remainder, pages, current_dir, total_pages)
             pages -= 1
@@ -151,11 +163,11 @@ def deathget(data_source):  # retrieves the dataset from coronavirus.gov.uk
     csv_file.close()
 
 
-def front_matter():  # creates the frontmatter of the book.
+def front_matter():  # creates the front matter of the book.
     blanks = 2
     for x in range (blanks):
         page = Image.new('RGB', (1748, 2480), color=(255, 255, 255))  # makes the blank page
-        page.save(f"frnt0{x}.png")  # saves a file with the appropriate number
+        page.save(f"frnt00{x}.png")  # saves a file with the appropriate number
     page = Image.new('RGB', (1748, 2480), color=(255, 255, 255))  # makes the blank page
     title_font = ImageFont.truetype(font=f"{current_dir}/Assets/Fonts/Crimson-Bold.ttf", size=260, index=0, encoding='',
                                     layout_engine=None)  # the font for the main title
@@ -175,27 +187,27 @@ def front_matter():  # creates the frontmatter of the book.
                              fill=(000, 000, 000), align="center", spacing=10)
     page_text.text((422, 1660), f"Our leaders have blood on their hands.", font=intro_font, fill=(000, 000, 000))
     page_text.text((451, 2350), f"© Sydney Cardew for Idle Toil Press, 2021", font=copy_font, fill=(000, 000, 000))
-    page.save(f"frnt03.png")
+    page.save(f"frnt003.png")
 
 
-def back_matter(pages):
+def back_matter(pages):  # creates the back matter of the book.
     if pages % 2 == 0:
         blanks = 2
     else:
         blanks = 3
     for x in range (blanks):
         page = Image.new('RGB', (1748, 2480), color=(255, 255, 255))  # makes the blank page
-        page.save(f"rear0{x}.png")  # saves a file with the appropriate number
+        page.save(f"rear00{x}.png")  # saves a file with the appropriate number
 
 
-def pdf_maker():
-    os.chdir(f"{current_dir}/Output/")
-    canvas = Canvas("TheTally.pdf", pagesize='A5')
-    for entry in os.scandir(f"{current_dir}/Output/"):
-        filename = str(entry)[-12:-2]
-        Image(f"{current_dir}/Output/{filename}")
-        canvas.showPage()
-    canvas.save()
+def pdf_maker(today):  # creates the print-ready PDF
+    current_dir = os.getcwd()
+    pdf = FPDF('P', 'mm', 'A5')
+    for entry in os.scandir(f"{current_dir}"):
+        filename = str(entry)[-13:-2]
+        pdf.add_page()
+        pdf.image(f"{current_dir}/{filename}", 0, 0, 148)
+    pdf.output(f"{current_dir}/The_Tally-{today}.pdf")
 
 
 parser = argparse.ArgumentParser(prog="CoronaBook")
@@ -283,4 +295,4 @@ print(f"Creating back matter.\n")
 back_matter(pages)
 print(f"PNG generation is complete.\n")
 print(f"Generating PDF.\n")
-pdf_maker()
+pdf_maker(today)
