@@ -2,11 +2,11 @@
 *by Sydney Cardew*
 
 CoronaBook is a Python script that automatically 
-creates a printable book from a set of data, in this case the total deaths 
-from COVID-19 reported in the first year of the pandemic in the UK. By converting
-this raw data into a tangible physical object it is hoped that some sense
-of the enormity of the tragedy will be conveyed, that the intangible will be 
-reified.
+creates a printable book called 'The Tally' from a set of data, in this case 
+the total deaths from COVID-19 reported in the first year of the pandemic 
+in the UK. By converting this raw data into a tangible physical object it is 
+hoped that some sense of the enormity of the tragedy will be conveyed, that 
+the intangible will be reified.
 
 This is a work of art that is intended as an explicit indictment of the UK
 government's handling of this disaster. It builds on Keith A. Smith's idea
