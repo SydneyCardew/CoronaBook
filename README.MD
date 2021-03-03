@@ -1,13 +1,20 @@
 # CoronaBook
+*by Sydney Cardew*
 
 CoronaBook is a Python script that automatically 
-creates a book from a set of data, in this case the total deaths 
+creates a printable book from a set of data, in this case the total deaths 
 from COVID-19 reported in the first year of the pandemic. By converting
-this raw data into a tangible physical object, it is hoped that some sense
-of the enormity of the tragedy will be conveyed.
+this raw data into a tangible physical object it is hoped that some sense
+of the enormity of the tragedy will be conveyed, that the intangible will be 
+reified.
 
 This is a work of art that is intended as an explicit indictment of the UK
-government's handling of this disaster.
+government's handling of this disaster. It builds on Keith A. Smith's idea
+of the 'conceptual book'; in Smith's case this was a set of written instructions
+to create a book that would be difficult or highly impractical to make real,
+such as a bound copy of every single frame of *Fantasia*. In this case, the
+instructions are written in computer code and result in a PDF which should be
+ready to be printed through any variety of on-demand services.
 
 ---
 
@@ -37,6 +44,7 @@ of the pandemic, whilst 'total' creates a book up to the latest available date.
 working correctly. Logging and terminal under way.   
 **0.1.1**: Minor bug fixes, added font licensing info.    
 **0.2.0**: Front and back matter generation.
+**0.2.1**: Expanded README, some small tweaks.
 
 ---
 
@@ -45,9 +53,12 @@ working correctly. Logging and terminal under way.
 CoronaBook uses the argparse, configparser, csv, errno, os, requests, sys, 
 PILlow and datetime Python modules. Written in Python 3.8.2
 
-##### Appendix 2: Assets
+##### Appendix 2: Assets and Utilities
 
 The font 'Crimson' is Copyright (c) 2010, Sebastian Kosch (sebastian@aldusleaf.org), 
 with Reserved Font Name “Crimson Text”.
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
+
+This project was written in the PyCharm IDE; iconography and layouts were created
+with the Adobe Creative Suite.

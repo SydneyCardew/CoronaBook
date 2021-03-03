@@ -62,7 +62,7 @@ def page_draw(page_icon, pages, current_dir, total_pages):  # this routine creat
         cursor_y = 148 + (108 * row)
         page.paste(icon, box=(cursor_x, cursor_y), mask=None)
     text_font = ImageFont.truetype(font=f"{current_dir}/Assets/Fonts/Crimson-Italic.ttf", size=40, index=0, encoding='',
-                                  layout_engine=None)  # the font for the top and bottom matter
+                                   layout_engine=None)  # the font for the top and bottom matter
     page_text = ImageDraw.Draw(page)
     page_offset = page_text.textsize(f"Page {pages}", font=text_font)  # gets offset for right-aligned page numbers
     if even_page is True:
@@ -161,7 +161,7 @@ def front_matter():  # creates the frontmatter of the book.
     name_font = ImageFont.truetype(font=f"{current_dir}/Assets/Fonts/Crimson-Semibolditalic.ttf", size=70,
                                    index=0, encoding='', layout_engine=None)  # the font for the author's name
     intro_font = ImageFont.truetype(font=f"{current_dir}/Assets/Fonts/Crimson-Roman.ttf", size=60,
-                                   index=0, encoding='', layout_engine=None)  # the font for the intro
+                                    index=0, encoding='', layout_engine=None)  # the font for the intro
     copy_font = ImageFont.truetype(font=f"{current_dir}/Assets/Fonts/Crimson-Semibold.ttf", size=50,
                                    index=0, encoding='', layout_engine=None)  # the font for the copyright notice
     page_text = ImageDraw.Draw(page)
