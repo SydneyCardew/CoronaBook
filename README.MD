@@ -21,12 +21,21 @@ coronavirus.gov.uk
 **-u, --user** - Causes the program to use the user-defined config settings as
 opposed to the default
 
+##### Config Settings:
+
+*data_source* : Controls where in the coronavirus.gov.uk API the data 
+is downloaded from    
+*log_length* : The length to which the log filenames are padded    
+*mode* : Controls the program mode. '1year' creates a book for the first year
+of the pandemic, whilst 'total' creates a book up to the latest available date.
+
 ---
 
 ### Version history
 
-0.1 : **THIS VERSION** - Creation of PNG files for the body of the book 
-working correctly. Logging and other 
+**0.1**: Creation of PNG files for the body of the book 
+working correctly. Logging and terminal under way.   
+**0.1.1**: Minor bug fixes, added font licensing info.
 
 ---
 
@@ -34,3 +43,10 @@ working correctly. Logging and other
 
 CoronaBook uses the argparse, configparser, csv, errno, os, requests, sys, 
 PILlow and datetime Python modules. Written in Python 3.8.2
+
+##### Appendix 2: Assets
+
+The font 'Crimson' is Copyright (c) 2010, Sebastian Kosch (sebastian@aldusleaf.org), 
+with Reserved Font Name “Crimson Text”.
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.

@@ -42,7 +42,7 @@ def draw_page(draw_criteria, pages, current_dir, remainder, whole_pages):  # con
             print('|', end='')
             if page_counter % 20 == 0:  # keeps the tally neat
                 print('')
-        print('100%')
+        print(' 100%')
     else:
         pass
 
@@ -95,7 +95,7 @@ def page_draw(page_icon, pages, current_dir, total_pages):  # this routine creat
     page_text.text((cursor_x, cursor_y), f"The Tally", font=textfont,
                    fill=(000, 000, 000))
     padding = len(str(total_pages)) - len(str(pages))
-    page.save(f"body{padding * '0'}{pages}.png")  # saves a file with the appropriate number
+    page.save(f"main{padding * '0'}{pages}.png")  # saves a file with the appropriate number
     if args.log:
         small_time = now.strftime("%H:%M:%S")
         log.write(f"Page {padding * '0'}{pages} created successfully at {small_time}\n")
@@ -150,6 +150,13 @@ def deathget(data_source):  # retrieves the dataset from coronavirus.gov.uk
     csv_file.close()
 
 
+def front_pages():  # creates the frontmatter of the book.
+    blanks = 2
+    for x in range (blanks):
+        page = Image.new('RGB', (1748, 2480), color=(255, 255, 255))  # makes the blank page
+        page.save(f"front{0}{x}.png")  # saves a file with the appropriate number
+
+
 parser = argparse.ArgumentParser(prog="CoronaBook")
 parser.add_argument("-l", "--log", action='store_true', help="saves a log")
 parser.add_argument("-u", "--user", action='store_true', help="uses user config settings")
@@ -159,12 +166,13 @@ current_dir = os.getcwd()  # retrieves the current directory in which the script
 today = str(date.today())  # gets today's date
 config = configparser.ConfigParser()
 if args.user:
-    configseg = 'CURRENT'
+    config_seg = 'CURRENT'
 else:
-    configseg = 'DEFAULT'
+    config_seg = 'DEFAULT'
 config.read('Settings/config.ini')
-data_source = config[(configseg)]['data_source']  # gets the data url
-log_length = config[(configseg)]['log_length']
+data_source = config[(config_seg)]['data_source']  # gets the data url
+log_length = int(config[(config_seg)]['log_length'])  # gets the log length
+mode = config[(config_seg)]['mode']  # gets the mode
 if args.log:
     now = datetime.now()
     small_time = now.strftime("%H:%M:%S")
@@ -194,10 +202,16 @@ if table_data is None:
     print('Error! No dataset available. Program will end.')
     sys.exit()
 del table_data[0]
-while (len(table_data)) > 365:
-    del table_data[0]
-if (len(table_data)) < 365:
-    print('Error! Less than 1 years data exists. Proceeding with available dataset.')
+if mode == '1year':
+    while (len(table_data)) > 365:
+        del table_data[0]
+if mode == '1year':
+    if (len(table_data)) < 365:
+        print('Error! Less than 1 years data exists. Proceeding with available dataset.')
+if mode == '1year':
+    time_string = 'year'
+elif mode == 'total':
+    time_string = 'time'
 latest_death_date = table_data[0][0][1:-1]
 first_death_date = table_data[-1][0][1:-1]
 death_number = int(table_data[0][4])
@@ -211,12 +225,15 @@ A program by Sydney Cardew
 ---
 
 """)
-print(f"The first person in the UK died of Coronavirus on {first_death_date}. In the year since,"
+print(f"The first person in the UK died of Coronavirus on {first_death_date}. In the {time_string} since,"
       f" {death_number} have died.\n")
-print(f"This program cornstructs a book called \'The Tally\' containing an icon for each individual death, in order to")
+print(f"This program constructs a book called \'The Tally\' containing an icon for each individual death, in order to")
 print(f"convey the enormity of the tragedy by converting the data into a physical object.\n")
 print(f"It is intended as an explicit indictment of the British government's handling of this disaster.\n")
 input(f"Press enter to continue with memorial book generation.\n")
 pages, whole_pages, remainder = book_stats(death_number)
 print(f"500 deaths can be recorded on each page. The book will have {pages} pages of deaths.\n")
 draw_page('main', pages, current_dir, remainder, whole_pages)
+print('')
+print(f"Creating front mattter.")
+front_pages()
