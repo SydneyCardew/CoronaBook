@@ -61,10 +61,10 @@ def page_draw(page_icon, pages, current_dir, total_pages):  # this routine creat
         cursor_x = 65 + (65 * column)
         cursor_y = 148 + (108 * row)
         page.paste(icon, box=(cursor_x, cursor_y), mask=None)
-    textfont = ImageFont.truetype(font=f"{current_dir}/Assets/Fonts/Crimson-Italic.ttf", size=40, index=0, encoding='',
+    text_font = ImageFont.truetype(font=f"{current_dir}/Assets/Fonts/Crimson-Italic.ttf", size=40, index=0, encoding='',
                                   layout_engine=None)  # the font for the top and bottom matter
     page_text = ImageDraw.Draw(page)
-    page_offset = page_text.textsize(f"Page {pages}", font=textfont)  # gets offset for right-aligned page numbers
+    page_offset = page_text.textsize(f"Page {pages}", font=text_font)  # gets offset for right-aligned page numbers
     if even_page is True:
         cursor_x = 78
     elif even_page is False:
@@ -72,27 +72,27 @@ def page_draw(page_icon, pages, current_dir, total_pages):  # this routine creat
         cursor_x -= page_offset[0]
     cursor_y = 2340
     page_text = ImageDraw.Draw(page)
-    page_text.text((cursor_x, cursor_y), f"Page {pages}", font=textfont,
+    page_text.text((cursor_x, cursor_y), f"Page {pages}", font=text_font,
                    fill=(000, 000, 000))
     first_tally = ((pages - 1) * 500) + 1  # these two lines work out the numbers to be displayed for deaths per page
     second_tally = (first_tally + page_icon) - 1
-    death_offset = page_text.textsize(f"Deaths {first_tally} - {second_tally}", font=textfont)
+    death_offset = page_text.textsize(f"Deaths {first_tally} - {second_tally}", font=text_font)
     if even_page is True:
         cursor_x = 78
     elif even_page is False:
         cursor_x = 1670
         cursor_x -= death_offset[0]
     cursor_y = 70
-    page_text.text((cursor_x, cursor_y), f"Deaths {first_tally} - {second_tally}", font=textfont,
+    page_text.text((cursor_x, cursor_y), f"Deaths {first_tally} - {second_tally}", font=text_font,
                    fill=(000, 000, 000))
-    tally_offset = page_text.textsize(f"The Tally", font=textfont)
+    tally_offset = page_text.textsize(f"The Tally", font=text_font)
     if even_page is False:
         cursor_x = 78
     elif even_page is True:
         cursor_x = 1670
         cursor_x -= tally_offset[0]
     cursor_y = 70
-    page_text.text((cursor_x, cursor_y), f"The Tally", font=textfont,
+    page_text.text((cursor_x, cursor_y), f"The Tally", font=text_font,
                    fill=(000, 000, 000))
     padding = len(str(total_pages)) - len(str(pages))
     page.save(f"main{padding * '0'}{pages}.png")  # saves a file with the appropriate number
@@ -150,11 +150,41 @@ def deathget(data_source):  # retrieves the dataset from coronavirus.gov.uk
     csv_file.close()
 
 
-def front_pages():  # creates the frontmatter of the book.
+def front_matter():  # creates the frontmatter of the book.
     blanks = 2
     for x in range (blanks):
         page = Image.new('RGB', (1748, 2480), color=(255, 255, 255))  # makes the blank page
-        page.save(f"front{0}{x}.png")  # saves a file with the appropriate number
+        page.save(f"front0{x}.png")  # saves a file with the appropriate number
+    page = Image.new('RGB', (1748, 2480), color=(255, 255, 255))  # makes the blank page
+    title_font = ImageFont.truetype(font=f"{current_dir}/Assets/Fonts/Crimson-Bold.ttf", size=260, index=0, encoding='',
+                                    layout_engine=None)  # the font for the main title
+    name_font = ImageFont.truetype(font=f"{current_dir}/Assets/Fonts/Crimson-Semibolditalic.ttf", size=70,
+                                   index=0, encoding='', layout_engine=None)  # the font for the author's name
+    intro_font = ImageFont.truetype(font=f"{current_dir}/Assets/Fonts/Crimson-Roman.ttf", size=60,
+                                   index=0, encoding='', layout_engine=None)  # the font for the intro
+    copy_font = ImageFont.truetype(font=f"{current_dir}/Assets/Fonts/Crimson-Semibold.ttf", size=50,
+                                   index=0, encoding='', layout_engine=None)  # the font for the copyright notice
+    page_text = ImageDraw.Draw(page)
+    page_text.text((200, 620), f"THE TALLY", font=title_font, fill=(000, 000, 000))
+    page_text.multiline_text((660, 1050), f"An Artist’s Book\nBy Sydney Cardew", font=name_font, align="center",
+                             spacing=10, fill=(000, 000, 000))
+    page.paste((190, 190, 190), box=(280, 1370, 1468, 1780))
+    page_text.multiline_text((360, 1440), f"A record of the deaths during the 1st\n"
+                                          f"year of the Coronavirus pandemic in the UK", font=intro_font,
+                             fill=(000, 000, 000), align="center", spacing=10)
+    page_text.text((422, 1660), f"Our leaders have blood on their hands.", font=intro_font, fill=(000, 000, 000))
+    page_text.text((451, 2350), f"© Sydney Cardew for Idle Toil Press, 2021", font=copy_font, fill=(000, 000, 000))
+    page.save(f"front03.png")
+
+
+def back_matter(pages):
+    if pages % 2 == 0:
+        blanks = 2
+    else:
+        blanks = 3
+    for x in range (blanks):
+        page = Image.new('RGB', (1748, 2480), color=(255, 255, 255))  # makes the blank page
+        page.save(f"back0{x}.png")  # saves a file with the appropriate number
 
 
 parser = argparse.ArgumentParser(prog="CoronaBook")
@@ -235,5 +265,8 @@ pages, whole_pages, remainder = book_stats(death_number)
 print(f"500 deaths can be recorded on each page. The book will have {pages} pages of deaths.\n")
 draw_page('main', pages, current_dir, remainder, whole_pages)
 print('')
-print(f"Creating front mattter.")
-front_pages()
+print(f"Creating front matter.\n")
+front_matter()
+print(f"Creating back matter.\n")
+back_matter(pages)
+print(f"PNG generation is complete.")

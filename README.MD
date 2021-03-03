@@ -33,9 +33,10 @@ of the pandemic, whilst 'total' creates a book up to the latest available date.
 
 ### Version history
 
-**0.1**: Creation of PNG files for the body of the book 
+**0.1.0**: Creation of PNG files for the body of the book 
 working correctly. Logging and terminal under way.   
-**0.1.1**: Minor bug fixes, added font licensing info.
+**0.1.1**: Minor bug fixes, added font licensing info.    
+**0.2.0**: Front and back matter generation.
 
 ---
 
