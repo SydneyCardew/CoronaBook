@@ -8,6 +8,7 @@ import sys
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
+from PIL import ImageChops
 from datetime import date
 from datetime import datetime
 from fpdf import FPDF
@@ -19,10 +20,10 @@ def draw_page(draw_criteria, pages, current_dir, remainder, whole_pages):  # con
     if args.log:
         log.write(f"Creating PNG pages:\n\n")
     if draw_criteria == 'test':  # test area (unused)
-        icon = Image.open(f"{current_dir}/Assets/Icons/Deathicon.png")
+        icon = Image.open(f"{current_dir}/Assets/Icons/death_icon.png")
         page = Image.new('RGB', (1748, 2480), color=(255, 255, 255))
         page.paste(icon, box=(200, 200), mask=None)
-        page.save('test.png')  # saves a file with the appropriate number
+        page.save('test.png')
         page.close()
     elif draw_criteria == 'main':  # main routine
         try:
@@ -32,7 +33,6 @@ def draw_page(draw_criteria, pages, current_dir, remainder, whole_pages):  # con
                 raise
             pass
         output_increment = 0
-        path_pad_string = path_pad(log_increment, log_length)
         while os.path.exists(f"{current_dir}/Output/Tally {output_increment}"):
             output_increment += 1
         try:
@@ -61,7 +61,7 @@ def draw_page(draw_criteria, pages, current_dir, remainder, whole_pages):  # con
 
 
 def page_draw(page_icon, pages, current_dir, total_pages):  # this routine creates individual pages
-    icon = Image.open(f"{current_dir}/Assets/Icons/Deathicon.png")  # imports the death icon
+    icon = Image.open(f"{current_dir}/Assets/Icons/death_icon.png")  # imports the death icon
     page = Image.new('RGB', (1748, 2480), color=(255, 255, 255))  # makes the blank page
     if pages % 2 == 0:
         even_page = True
@@ -149,7 +149,7 @@ def read_csv(current_dir):  # reads the csv file
     return table_data
 
 
-def deathget(data_source):  # retrieves the dataset from coronavirus.gov.uk
+def death_get(data_source):  # retrieves the dataset from coronavirus.gov.uk
     req = requests.get(data_source)
     death_data = req.content
     if args.log:
@@ -163,12 +163,13 @@ def deathget(data_source):  # retrieves the dataset from coronavirus.gov.uk
     csv_file.close()
 
 
-def front_matter():  # creates the front matter of the book.
+def front_matter(mode):  # creates the front matter of the book.
     blanks = 2
     for x in range (blanks):
         page = Image.new('RGB', (1748, 2480), color=(255, 255, 255))  # makes the blank page
         page.save(f"frnt00{x}.png")  # saves a file with the appropriate number
     page = Image.new('RGB', (1748, 2480), color=(255, 255, 255))  # makes the blank page
+    isbn = Image.open(f"{current_dir}/Assets/Icons/ISBN.png")  # imports the isbn
     title_font = ImageFont.truetype(font=f"{current_dir}/Assets/Fonts/Crimson-Bold.ttf", size=260, index=0, encoding='',
                                     layout_engine=None)  # the font for the main title
     name_font = ImageFont.truetype(font=f"{current_dir}/Assets/Fonts/Crimson-Semibolditalic.ttf", size=70,
@@ -182,12 +183,23 @@ def front_matter():  # creates the front matter of the book.
     page_text.multiline_text((660, 1050), f"An Artist’s Book\nBy Sydney Cardew", font=name_font, align="center",
                              spacing=10, fill=(000, 000, 000))
     page.paste((190, 190, 190), box=(280, 1370, 1468, 1780))
-    page_text.multiline_text((360, 1440), f"A record of the deaths during the 1st\n"
-                                          f"year of the Coronavirus pandemic in the UK", font=intro_font,
-                             fill=(000, 000, 000), align="center", spacing=10)
+    if mode == '1year':
+        page_text.multiline_text((360, 1440), f"A record of the deaths during the 1st\n"
+                                              f"year of the Coronavirus pandemic in the UK", font=intro_font,
+                                 fill=(000, 000, 000), align="center", spacing=10)
+    elif mode == 'total':
+        page_text.multiline_text((360, 1440), f"A record of the deaths during the\n"
+                                              f"time of the Coronavirus pandemic in the UK", font=intro_font,
+                                 fill=(000, 000, 000), align="center", spacing=10)
     page_text.text((422, 1660), f"Our leaders have blood on their hands.", font=intro_font, fill=(000, 000, 000))
+    if args.noisbn:
+        pass
+    else:
+        page.paste(isbn, box=(588, 1920), mask=None)
     page_text.text((451, 2350), f"© Sydney Cardew for Idle Toil Press, 2021", font=copy_font, fill=(000, 000, 000))
     page.save(f"frnt003.png")
+    if args.log:
+        log.write('Front matter successfully created.\n\n')
 
 
 def back_matter(pages):  # creates the back matter of the book.
@@ -198,22 +210,79 @@ def back_matter(pages):  # creates the back matter of the book.
     for x in range (blanks):
         page = Image.new('RGB', (1748, 2480), color=(255, 255, 255))  # makes the blank page
         page.save(f"rear00{x}.png")  # saves a file with the appropriate number
+    if args.log:
+        log.write('Back matter successfully created.\n\n')
+
+
+def cover_maker(current_dir, working_dir):  # makes the cover. Does not currently adjust for page count
+    cover = Image.new('RGB', (3762, 2556), color=(255, 255, 255))  # makes the blank cover
+    isbn = Image.open(f"{current_dir}/Assets/Icons/ISBN.png")  # imports the isbn
+    title_font = ImageFont.truetype(font=f"{current_dir}/Assets/Fonts/Crimson-Bold.ttf", size=260, index=0, encoding='',
+                                    layout_engine=None)  # the font for the main title
+    name_font = ImageFont.truetype(font=f"{current_dir}/Assets/Fonts/Crimson-Semibold.ttf", size=100,
+                                   index=0, encoding='', layout_engine=None)  # the font for the front name
+    spine_title_font = ImageFont.truetype(font=f"{current_dir}/Assets/Fonts/Crimson-Semibold.ttf", size=90,
+                                          index=0, encoding='', layout_engine=None)  # the font for the front name
+    spine_name_font = ImageFont.truetype(font=f"{current_dir}/Assets/Fonts/Crimson-Italic.ttf", size=90,
+                                         index=0, encoding='', layout_engine=None)  # the font for the front name
+    opacity_table = [x for x in range(1, 6)]
+    opacity_reverse = opacity_table[::-1]
+    opacity_table.extend(opacity_reverse)
+    pos_table_raw = [x for x in range (120, 601) if x % 120 == 0]
+    pos_table = []
+    for entry in pos_table_raw:
+        pos_table.append(entry + 448)
+    for entry in pos_table_raw:
+        pos_table.append(entry + 1345)
+    for value in range(len(opacity_table)):
+        for repeat_icon in range(24):
+            icon = Image.open(f"{current_dir}/Assets/Icons/cover_icon_{opacity_table[value]}.png")  # gets correct icon
+            x_cursor = 2228 + (54 * repeat_icon)
+            y_cursor = pos_table[value]
+            cover.paste(icon, box=(x_cursor, y_cursor), mask=None)
+    cover_text = ImageDraw.Draw(cover)
+    cover_text.text((2206, 1216), f"THE TALLY", font=title_font, fill=(000, 000, 000))
+    cover_text.text((2532, 2250), f"Sydney Cardew", font=name_font, fill=(000, 000, 000))
+    spine = Image.new('RGB', (1142, 180), color=(255, 255, 255))  # makes the temporary image for the spine
+    spine_text = ImageDraw.Draw(spine)
+    spine_text.text((80, 45), f"Sydney Cardew", font=spine_name_font, fill=(000, 000, 000))
+    spine_text.text((694, 45), f"The Tally", font=spine_title_font, fill=(000, 000, 000))
+    spine_rotate = spine.rotate(270, expand=1)
+    cover.paste(spine_rotate, (1780, 700))
+    if args.noisbn:
+        pass
+    else:
+        cover.paste(isbn, (872, 2106))
+    cover.save(f"{working_dir}/cover_wrap.png")
+    cover_pdf = FPDF('P', 'mm', (318.511, 216.408))
+    cover_pdf.add_page()
+    cover_pdf.image(f"{working_dir}/cover_wrap.png", 0, 0, 318.511)
+    cover_pdf.output(f"{working_dir}/cover_pdf.pdf")
+    if args.logs:
+        log.write(f"Cover successfully generated.\n\n")
 
 
 def pdf_maker(today):  # creates the print-ready PDF
-    current_dir = os.getcwd()
+    working_dir = os.getcwd()
     pdf = FPDF('P', 'mm', 'A5')
-    for entry in os.scandir(f"{current_dir}"):
+    for entry in os.scandir(f"{working_dir}"):
         filename = str(entry)[-13:-2]
         pdf.add_page()
-        pdf.image(f"{current_dir}/{filename}", 0, 0, 148)
-    pdf.output(f"{current_dir}/The_Tally-{today}.pdf")
+        pdf.image(f"{working_dir}/{filename}", 0, 0, 148)
+    pdf.output(f"{working_dir}/The_Tally-{today}.pdf")
+    if args.log:
+        log.write('PDF of \'The Tally\' successfully created.\n\n')
+    return (working_dir)
 
 
 parser = argparse.ArgumentParser(prog="CoronaBook")
 parser.add_argument("-l", "--log", action='store_true', help="saves a log")
 parser.add_argument("-u", "--user", action='store_true', help="uses user config settings")
 parser.add_argument("-nd", "--nodownload", action='store_true', help="does not download a new csv file")
+parser.add_argument("-nc", "--nocover", action='store_true', help="does not create a cover")
+parser.add_argument("-ct", "--covertest", action='store_true', help="creates just a cover")
+parser.add_argument("-ni", "--noisbn", action='store_true', help="creates a version without an ISBN")
+parser.add_argument("-v", "--version", action='version', version='0.5.1')
 args = parser.parse_args()
 current_dir = os.getcwd()  # retrieves the current directory in which the script is running
 today = str(date.today())  # gets today's date
@@ -250,10 +319,13 @@ if args.nodownload:
     if args.log:
         log.write('No new download request.\n\n')
 else:
-    deathget(data_source)
+    death_get(data_source)
 table_data = read_csv(current_dir)
 if table_data is None:
     print('Error! No dataset available. Program will end.')
+    if args.log:
+        log.write('Error! No dataset available. Program will end.')
+        log.close()
     sys.exit()
 del table_data[0]
 if mode == '1year':
@@ -262,6 +334,8 @@ if mode == '1year':
 if mode == '1year':
     if (len(table_data)) < 365:
         print('Error! Less than 1 years data exists. Proceeding with available dataset.')
+        if args.log:
+            log.write('Error! Less than 1 years data exists. Proceeding with available dataset.')
 if mode == '1year':
     time_string = 'year'
 elif mode == 'total':
@@ -269,30 +343,47 @@ elif mode == 'total':
 latest_death_date = table_data[0][0][1:-1]
 first_death_date = table_data[-1][0][1:-1]
 death_number = int(table_data[0][4])
-print("""
-CoronaBook
-
----
-
-A program by Sydney Cardew
-
----
-
-""")
-print(f"The first person in the UK died of Coronavirus on {first_death_date}. In the {time_string} since,"
-      f" {death_number} have died.\n")
-print(f"This program constructs a book called \'The Tally\' containing an icon for each individual death, in order to")
-print(f"convey the enormity of the tragedy by converting the data into a physical object.\n")
-print(f"It is intended as an explicit indictment of the British government's handling of this disaster.\n")
-input(f"Press enter to continue with memorial book generation.\n")
-pages, whole_pages, remainder = book_stats(death_number)
-print(f"500 deaths can be recorded on each page. The book will have {pages} pages of deaths.\n")
-draw_page('main', pages, current_dir, remainder, whole_pages)
-print('')
-print(f"Creating front matter.\n")
-front_matter()
-print(f"Creating back matter.\n")
-back_matter(pages)
-print(f"PNG generation is complete.\n")
-print(f"Generating PDF.\n")
-pdf_maker(today)
+if args.covertest:
+    working_dir_flag = False
+else:
+    print("""
+    CoronaBook
+    
+    ---
+    
+    A program by Sydney Cardew
+    
+    ---
+    
+    """)
+    print(f"The first person in the UK died of Coronavirus on {first_death_date}. In the {time_string} since,"
+          f" {death_number} have died.\n")
+    print(f"This program constructs a book called \'The Tally\' containing an icon for each individual death, in order")
+    print(f"to convey the enormity of the tragedy by converting the data into a physical object.\n")
+    print(f"It is intended as an explicit indictment of the British government's handling of this disaster.\n")
+    input(f"Press enter to continue with memorial book generation.\n")
+    pages, whole_pages, remainder = book_stats(death_number)
+    print(f"500 deaths can be recorded on each page. The book will have {pages} pages of deaths.\n")
+    draw_page('main', pages, current_dir, remainder, whole_pages)
+    print('')
+    print(f"Creating front matter.\n")
+    front_matter(mode)
+    print(f"Creating back matter.\n")
+    back_matter(pages)
+    print(f"PNG generation is complete.\n")
+    print(f"Generating PDF.\n")
+    working_dir = pdf_maker(today)
+    working_dir_flag = True
+    print(f"PDF generation is complete.\n")
+    print(f"Book successfully generated in {working_dir}.\n")
+if args.nocover:
+    pass
+else:
+    if working_dir_flag is False:
+        working_dir = current_dir
+    print(f"Generating cover wrap.\n")
+    cover_maker(current_dir, working_dir)
+    print(f"Cover wrap generation complete.\n")
+if args.log:
+    log.write('CoronaBook has generated successfully.\n')
+    log.close()
