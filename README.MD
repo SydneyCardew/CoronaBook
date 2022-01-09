@@ -1,12 +1,15 @@
 # CoronaBook
+### Second Edition
 *by Sydney Cardew*
 
 CoronaBook is a Python script that automatically 
 creates a printable book called 'The Tally' from a set of data, in this case 
-the total deaths from COVID-19 reported in the first year of the pandemic 
-in the UK. By converting this raw data into a tangible physical object it is 
-hoped that some sense of the enormity of the tragedy will be conveyed, that 
-the intangible will be reified.
+the total deaths from COVID-19 reported in the first two years of the ongoing
+pandemic in the UK. By converting this raw data into a tangible physical 
+object it is hoped that some sense of the enormity of the tragedy will be 
+conveyed, that the intangible will be reified.
+
+The fact that a second edition of this work is called for is a catastrophe.
 
 This is a work of art that is intended as an explicit indictment of the UK
 government's handling of this disaster. It builds on Keith A. Smith's idea
@@ -17,9 +20,12 @@ instructions are written in computer code and result in a PDF which should be
 ready to be printed through any variety of on-demand services. If you wish to
 print your own copy you should run the program in '-ni' ('no isbn') mode, as
 the ISBN is specifically registered to the artist for sale of the book through
-lulu.com. You may buy an 'official' copy here:
+lulu.com. You may buy an 'official' copy of the first edition here:
 
 https://www.lulu.com/en/gb/shop/sydney-cardew/the-tally/paperback/product-yrj5gy.html
+
+A Second Edition of *The Tally* will be published to commemorate the second anniversary
+of the pandemic on the 2nd of March 2022.
 
 Though the book contains a standard copyright notice, explicit permission is
 given here to print copies of the book for personal use or display, providing 
@@ -57,7 +63,7 @@ no isbn information, essential if you plan on printing your own copy of the book
 **-u, --user** - Causes the program to use the user-defined config settings as
 opposed to the default
 
-
+---
 
 #### Config Settings:
 
@@ -78,7 +84,9 @@ working correctly. Logging and terminal under way.
 **0.2.1**: Expanded README, some small tweaks.    
 **0.2.2**: Further tweaks, prototyping PDF maker function.     
 **0.5.0**: PDF maker function working, further refinements.    
-**1.0.0**: Full generation of internal matter and cover with ISBN number.
+**1.0.0**: Full generation of internal matter and cover with ISBN number.    
+**1.1.0**: Refactored code, re-worked to add a new '2 year' mode in preparation
+for the second edition of The Tally.
 
 ---
 
